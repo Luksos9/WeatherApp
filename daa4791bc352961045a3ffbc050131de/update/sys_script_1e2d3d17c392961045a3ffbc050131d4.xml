@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>true</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>x_793388_weatherlo_cityweatherinfo</collection>
+        <condition/>
+        <description/>
+        <execute_function>false</execute_function>
+        <filter_condition/>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>Populate Weather Data</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function() {
+    if (!current.city) {
+        gs.info('City not provided.');
+        return;
+    }
+    try {
+		var r = new sn_ws.RESTMessageV2('x_793388_weatherlo.OpenWeather', 'GetCurrentWeather');
+		r.setStringParameterNoEscape('units', 'metric');
+		r.setStringParameterNoEscape('apikey', gs.getProperty('x_793388_weatherlo.weather_api_key'));
+		r.setStringParameterNoEscape('city', current.city);
+        
+        var response = r.execute();
+        var responseBody = response.getBody();
+        var httpStatus = response.getStatusCode();
+
+		gs.info('getBody: '+ responseBody, 'kkk');
+		gs.info('getStatus: ' + httpStatus, 'kkk');
+        
+        if (httpStatus == 200) {
+            var responseObj = JSON.parse(responseBody);
+            var temp = responseObj.main && responseObj.main.temp ? responseObj.main.temp : 'N/A';
+            var condition = (responseObj.weather && responseObj.weather.length > 0) ? responseObj.weather[0].description : 'N/A';
+            
+            current.temperature = temp.toString();
+            current.condition = condition;
+            current.update();
+        } else {
+            gs.warn('Weather API returned status: ' + httpStatus);
+        }
+    } catch(ex) {
+        gs.error('Error fetching weather: ' + ex.message);
+    }
+})();
+]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-12-11 08:27:11</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>1e2d3d17c392961045a3ffbc050131d4</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Populate Weather Data</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="WeatherLookup" source="x_793388_weatherlo">daa4791bc352961045a3ffbc050131de</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="WeatherLookup">daa4791bc352961045a3ffbc050131de</sys_scope>
+        <sys_update_name>sys_script_1e2d3d17c392961045a3ffbc050131d4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-12-11 09:00:51</sys_updated_on>
+        <template/>
+        <when>async_always</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=1e2d3d17c392961045a3ffbc050131d4"/>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>1e2d3d17c392961045a3ffbc050131d4</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2024-12-11 08:39:06</sys_created_on>
+        <sys_id>b0ef7d9bc392961045a3ffbc05013110</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2024-12-11 08:39:06</sys_updated_on>
+        <table>sys_script</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>
